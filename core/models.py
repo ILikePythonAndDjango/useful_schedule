@@ -17,7 +17,7 @@ class Goal(models.Model):
     begin = models.DateField(auto_now_add=True)
     deadline = models.DateField()
     is_done = models.BooleanField(default=False)
-    sub_goals = models.ManyToManyField('Goal', blank=True, null=True)
+    sub_goals = models.ManyToManyField('Goal', blank=True)
     cost = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
