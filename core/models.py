@@ -13,7 +13,7 @@ class Goal(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    tag = models.ForeignKey(TypeGoal, on_delete=models.SET_NULL)
+    tag = models.ForeignKey(TypeGoal, on_delete=models.SET_NULL, blank=True, null=True)
     begin = models.DateField(auto_now_add=True)
     deadline = models.DateField()
     is_done = models.BooleanField(default=False)
