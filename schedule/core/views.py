@@ -2,6 +2,8 @@ from django.shortcuts import render
 
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
 
-def goals(request):
+from .models import Goal
 
-	return HttpResponseAjax(key='value')
+def goals(request):
+	goals = [goal.title for goal in Goal.objects.all()[:]]
+	return HttpResponseAjax(goals=goals)
