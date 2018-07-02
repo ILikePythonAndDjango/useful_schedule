@@ -1,0 +1,1 @@
+2018/07/03 00:44:18 [error] 5888#5888: *86 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /goals/ HTTP/1.1", upstream: "http://0.0.0.0:8000/goals/", host: "127.0.0.1", referrer: "http://127.0.0.1/"

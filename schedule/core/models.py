@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from django.urls import reverse
 
 class TypeGoal(models.Model):
 
@@ -23,3 +24,7 @@ class Goal(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def url(self):
+        return reverse('goal', kwargs={'pk': self.id})

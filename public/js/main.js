@@ -12,7 +12,7 @@ function loadData (method, url) {
 
 function getListUl (list) {
 	var result = '';
-	for (var i = 0; i < list.length; i++) result += '<li>' + list[i] + '</li>';
+	for (var i = 0; i < list.length; i++) result += '<li><a href="' + list[i][1] + '"' + list[i][0] + '</a></li>';
 	return '<ul>' + result + '</ul>';
 }
 

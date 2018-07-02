@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = (
     path('goals/', views.goals, name='goals'),
+    path('goals/<int:pk>/', views.goal, name='goal')
 )
