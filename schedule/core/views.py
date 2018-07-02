@@ -13,7 +13,7 @@ def goal(request, pk):
     return HttpResponseAjax(
         tittle=g.title,
         content=g.content,
-        deadline=g.deadline,
+        deadline=str(g.deadline),
         is_done=g.is_done,
         cost=g.cost
     )
