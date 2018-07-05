@@ -5,7 +5,7 @@ from django.views.decorators.http import require_GET
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
 from .pagination import paginate_JSON
 
-from .models import Goal, Note
+from .models import Goal, Note, Schedule
 
 from datetime import date
 
@@ -43,4 +43,33 @@ def note(request, pk):
         time=str(note.time),
         text=note.text,
         goals=note.goals
+    )
+
+@require_GET
+def schedules(request):
+    schedules = [(schedule.title, schedule.url, request.user.username) for schedule in Schedule.objects.all()]
+    return HttpResponseAjax(schedules=schedules)
+
+
+def schedule(request, pk):
+    try:
+        schedule = Schedule.objects.get(pk=pk)
+        tasks = []
+        for task in schedule.tasks.annotate():
+            tasks.append(
+                dict([
+                    ('title', task.title),
+                    ('description', task.description),
+                    ('begin', str(task.begin)),
+                    ('end', str(task.end)),
+                    ('time', task.time)
+                ])
+            )
+    except Schedule.DoesNotExist:
+        raise Http404
+    return HttpResponseAjax(
+        title=schedule.title,
+        url=schedule.url,
+        hours=schedule.hours,
+        tasks=tasks
     )

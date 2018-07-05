@@ -81,7 +81,11 @@ class Task(models.Model):
 
     @property
     def time(self):
-        return self.end - self.begin
+        '''returns the difference between end and begin as string'''
+        return '{}-{}'.format(
+            abs(self.end.hour - self.begin.hour),
+            abs(self.end.minute - self.begin.minute)
+        )
 
     class Meta:
         #It's very important point, because it set order of view tasks
@@ -97,5 +101,10 @@ class Schedule(models.Model):
         return self.title
 
     @property
+    def url(self):
+        '''Gets current url for the schedule'''
+        return reverse('schedule', kwargs={'pk': self.id})
+
+    @property
     def hours(self):
-        return sum([task.time.hour for task in self.tasks.annotate()])
+        return sum([int(task.time.split('-')[0]) for task in self.tasks.annotate()])
