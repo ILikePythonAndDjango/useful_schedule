@@ -11,7 +11,7 @@ from datetime import date
 
 @require_GET
 def goals(request):
-    goals = [(goal.title, goal.url, goal.id) for goal in Goal.objects.all()]
+    goals = [(goal.id, goal.title, goal.url) for goal in Goal.objects.all()]
     return HttpResponseAjax(goals=goals)
 
 def goal(request, pk):
@@ -56,15 +56,13 @@ def schedule(request, pk):
         schedule = Schedule.objects.get(pk=pk)
         tasks = []
         for task in schedule.tasks.annotate():
-            tasks.append(
-                dict([
-                    ('title', task.title),
-                    ('description', task.description),
-                    ('begin', str(task.begin)),
-                    ('end', str(task.end)),
-                    ('time', task.time)
-                ])
-            )
+            tasks.append(dict([
+                ('title', task.title),
+                ('description', task.description),
+                ('begin', str(task.begin)),
+                ('end', str(task.end)),
+                ('time', task.time)
+            ]))
     except Schedule.DoesNotExist:
         raise Http404
     return HttpResponseAjax(

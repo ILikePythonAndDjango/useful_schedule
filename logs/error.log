@@ -1,2 +1,0 @@
-2018/07/05 23:12:43 [error] 4561#4561: *1 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /schedules/ HTTP/1.1", upstream: "http://0.0.0.0:8000/schedules/", host: "127.0.0.1"
-2018/07/06 00:19:57 [error] 7660#7660: *3 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /schedules/1/ HTTP/1.1", upstream: "http://0.0.0.0:8000/schedules/1/", host: "127.0.0.1"
