@@ -5,7 +5,7 @@ from django.views.decorators.http import require_GET
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
 from .pagination import paginate_JSON
 
-from .models import Goal, Note, Schedule
+from .models import Goal, Note, Schedule, CostControl
 
 from datetime import date
 
@@ -36,13 +36,25 @@ def notes(request):
 def note(request, pk):
     try:
         note = Note.objects.get(id=pk)
+        cost_controls = [(cost.id, cost.thing, cost.url) for cost in note.cost_control.annotate()]
     except Note.DoesNotExist:
         raise Http404
     return HttpResponseAjax(
         date=str(note.date),
         time=str(note.time),
         text=note.text,
-        goals=note.goals
+        cost_control=cost_controls,
+        total_cost=note.total_cost
+    )
+
+def cost(request, cost_pk):
+    try:
+        cost = CostControl.objects.get(id=cost_pk)
+    except CostControl.DoesNotExist:
+        raise Http404
+    return HttpResponseAjax(
+        thing=cost.thing,
+        cost=cost.cost
     )
 
 @require_GET

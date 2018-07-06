@@ -1,0 +1,1 @@
+2018/07/06 23:38:00 [error] 5439#5439: *9 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /notes/2/ HTTP/1.1", upstream: "http://0.0.0.0:8000/notes/2/", host: "127.0.0.1"

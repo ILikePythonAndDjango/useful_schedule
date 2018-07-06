@@ -44,18 +44,27 @@ class Goal(models.Model):
         '''returns the difference between the beginning of the goal and its deadline'''
         return self.deadline - self.begin
 
+class CostControl(models.Model):
+
+    date = models.DateField(auto_now_add=True)
+    thing = models.CharField(max_length=100)
+    cost = models.IntegerField()
+
+    def __str__(self):
+        return self.thing
+
+    @property
+    def url(self):
+        '''Gets current url for the cost control.'''
+        return reverse('cost', kwargs={'cost_pk': self.id})
+
 class Note(models.Model):
     
     time = models.TimeField(auto_now_add=True)
     date = models.DateField(auto_now_add=True)
     text = models.TextField(blank=True, null=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    goals = models.ForeignKey(
-        'Goal', 
-        on_delete=models.SET_NULL, 
-        blank=True, 
-        null=True
-    )
+    cost_control = models.ManyToManyField('CostControl', blank=True)
 
     def __str__(self):
         return 'Day: {}, time: {}'.format(self.date, self.time)
@@ -64,6 +73,10 @@ class Note(models.Model):
     def url(self):
         '''Gets current url for the goal.'''
         return reverse('note', kwargs={'pk': self.id})
+
+    @property
+    def total_cost(self):
+        return sum([cost.cost for cost in self.cost_control.annotate()])
 
     class Meta:
         ordering = ('-date', 'time')
