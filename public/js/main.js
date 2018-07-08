@@ -1,45 +1,33 @@
-function replaceUrl(url, func=render, post=false) {
-	window.history.pushState({url: window.location.href}, '', window.location.href);
-	window.history.replaceState({url: url}, '', url);
-	loadData(post ? 'POST' : 'GET', url, func);
+var DIV = '#content';
+var CREATE = '<button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="">Create</button>';
 
+function ajaxRequest(url, render=renderUlList, properties={}, dataType='json', cache=false) {
+	$.ajax({
+		type: 'GET',
+		url: url,
+		data: properties,
+		dataType: dataType,
+		cache: cache,
+		success: render
+	})
 }
 
-function loadData (method, url, func) {
-	xhr = new XMLHttpRequest();
-	xhr.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			func(JSON.parse(this.responseText));
-		}
+function getUlList (sequence) {
+	result = '';
+	for (var el = 0; el < sequence.length; el++) {
+		result += '<li><button type="submit" onclik=\"ajaxRequest(\'' + sequence[el][2] +'\', renderObject)\">' + sequence[el][1] + '</button></li>';
 	}
-	xhr.open(method, url, true);
-	xhr.send('');
-}
-
-
-/* functions which drawn HTML tags */
-function getListUl (list) {
-	//return ul list with goals
-	var result = '';
-	for (var i = 0; i < list.length; i++) result += '<li id="' + list[i][2] + '"><a href="#" onclick="replaceUrl(\'/goals/' + list[i][2] + '/\', renderGoal)">' + list[i][0] + '</a></li>';
 	return '<ul>' + result + '</ul>';
 }
 
-function getViewGoal(goal){
-	//return HTML view some goal
-	return '<h2>' + goal.title + '</h2><p> deadline: ' 
-	+ goal.deadline + '</p><hr><p>' + goal.content + '</p>';
-}
-/* functions which drawn HTML tags */
-
-/* functions which render HTML tags */
-function render (data) {
-
-	//render own template with context
-	document.getElementsByClassName('starter-template')[0].innerHTML = getListUl(data.goals);
+function renderUlList(data) {
+	jQuery(DIV).html(getUlList(data.sequence) + CREATE);
 }
 
-function renderGoal(data) {
-	document.getElementsByClassName('starter-template')[0].innerHTML = getViewGoal(data);
+function getObject(object) {
+	return object;
 }
-/* functions which render HTML tags */
+
+function renderObject(data) {
+	jQuery(DIV).html(JSON.stringify(data));
+}

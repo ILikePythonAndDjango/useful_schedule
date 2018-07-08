@@ -12,7 +12,7 @@ from datetime import date
 @require_GET
 def goals(request):
     goals = [(goal.id, goal.title, goal.url) for goal in Goal.objects.all()]
-    return HttpResponseAjax(goals=goals)
+    return HttpResponseAjax(sequence=goals)
 
 def goal(request, pk):
     try:
@@ -30,8 +30,8 @@ def goal(request, pk):
 
 @require_GET
 def notes(request):
-    notes = [(str(note.date), str(note.time)) for note in Note.objects.all()]
-    return HttpResponseAjax(notes=notes)
+    notes = [(note.id, str(note.date)) for note in Note.objects.all()]
+    return HttpResponseAjax(sequence=notes)
 
 def note(request, pk):
     try:
@@ -59,8 +59,8 @@ def cost(request, cost_pk):
 
 @require_GET
 def schedules(request):
-    schedules = [(schedule.title, schedule.url, request.user.username) for schedule in Schedule.objects.all()]
-    return HttpResponseAjax(schedules=schedules)
+    schedules = [(schedule.id, schedule.title, schedule.url) for schedule in Schedule.objects.all()]
+    return HttpResponseAjax(sequence=schedules)
 
 
 def schedule(request, pk):
