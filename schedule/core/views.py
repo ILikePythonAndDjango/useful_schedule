@@ -11,55 +11,56 @@ from datetime import date
 
 @require_GET
 def goals(request):
-    goals = [(goal.id, goal.title, goal.url) for goal in Goal.objects.all()]
+    goals = [{'title': goal.title, 'url': goal.url} for goal in Goal.objects.all()]
     return HttpResponseAjax(sequence=goals)
 
 def goal(request, pk):
     try:
         goal = Goal.objects.get(pk=pk)
+        sub_goals = [{'title': sub_goal.title, 'url': sub_goal.url} for sub_goal in goal.sub_goals.annotate()]
     except Goal.DoesNotExist:
         raise Http404
-    return HttpResponseAjax(
-        title=goal.title,
-        content=goal.content,
-        deadline=str(goal.deadline),
-        is_done=goal.is_done,
-        cost=goal.cost,
-        sub_goals=[sub_goal.title for sub_goal in goal.sub_goals.annotate()]
-    )
+    return HttpResponseAjax(goal={
+        'title': goal.title,
+        'content': goal.content,
+        'deadline': str(goal.deadline),
+        'is_done': goal.is_done,
+        'cost': goal.cost,
+        'sub_goals': sub_goals
+    })
 
 @require_GET
 def notes(request):
-    notes = [(note.id, str(note.date)) for note in Note.objects.all()]
+    notes = [{'date': str(note.date), 'time': str(note.time)} for note in Note.objects.all()]
     return HttpResponseAjax(sequence=notes)
 
 def note(request, pk):
     try:
         note = Note.objects.get(id=pk)
-        cost_controls = [(cost.id, cost.thing, cost.url) for cost in note.cost_control.annotate()]
+        cost_controls = [{'thing': cost.thing, 'url': cost.url} for cost in note.cost_control.annotate()]
     except Note.DoesNotExist:
         raise Http404
-    return HttpResponseAjax(
-        date=str(note.date),
-        time=str(note.time),
-        text=note.text,
-        cost_control=cost_controls,
-        total_cost=note.total_cost
-    )
+    return HttpResponseAjax(note={
+        'date': str(note.date),
+        'time': str(note.time),
+        'text': note.text,
+        'cost_control': cost_controls,
+        'total_cost': note.total_cost
+    })
 
 def cost(request, cost_pk):
     try:
         cost = CostControl.objects.get(id=cost_pk)
     except CostControl.DoesNotExist:
         raise Http404
-    return HttpResponseAjax(
-        thing=cost.thing,
-        cost=cost.cost
-    )
+    return HttpResponseAjax(cost={
+        'thing': cost.thing,
+        'cost': cost.cost
+    })
 
 @require_GET
 def schedules(request):
-    schedules = [(schedule.id, schedule.title, schedule.url) for schedule in Schedule.objects.all()]
+    schedules = [{'title': schedule.title, 'url': schedule.url} for schedule in Schedule.objects.all()]
     return HttpResponseAjax(sequence=schedules)
 
 
@@ -68,18 +69,18 @@ def schedule(request, pk):
         schedule = Schedule.objects.get(pk=pk)
         tasks = []
         for task in schedule.tasks.annotate():
-            tasks.append(dict([
-                ('title', task.title),
-                ('description', task.description),
-                ('begin', str(task.begin)),
-                ('end', str(task.end)),
-                ('time', task.time)
-            ]))
+            tasks.append({
+                'title': task.title,
+                'description': task.description,
+                'begin': str(task.begin),
+                'end': str(task.end),
+                'time': task.time
+            })
     except Schedule.DoesNotExist:
         raise Http404
-    return HttpResponseAjax(
-        title=schedule.title,
-        url=schedule.url,
-        hours=schedule.hours,
-        tasks=tasks
-    )
+    return HttpResponseAjax(schedule={
+        "title": schedule.title,
+        "url": schedule.url,
+        "hours": schedule.hours,
+        "tasks": tasks
+    })
