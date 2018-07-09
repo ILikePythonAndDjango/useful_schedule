@@ -2,3 +2,13 @@
 .container {
 	margin-top: 80px;
 }
+
+.task_content {
+	width: 250px;
+	float: left;
+	clear: both;
+}
+
+.uniform {
+	margin-bottom: 5px;
+}
