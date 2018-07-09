@@ -31,13 +31,13 @@ def goal(request, pk):
 
 @require_GET
 def notes(request):
-    notes = [{'date': str(note.date), 'time': str(note.time)} for note in Note.objects.all()]
+    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.all()]
     return HttpResponseAjax(sequence=notes)
 
 def note(request, pk):
     try:
         note = Note.objects.get(id=pk)
-        cost_controls = [{'thing': cost.thing, 'url': cost.url} for cost in note.cost_control.annotate()]
+        cost_controls = [{'thing': cost.thing, 'url': cost.url, 'cost': cost.cost} for cost in note.cost_control.annotate()]
     except Note.DoesNotExist:
         raise Http404
     return HttpResponseAjax(note={
