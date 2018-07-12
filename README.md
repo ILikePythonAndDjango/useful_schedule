@@ -34,3 +34,8 @@ Some note
 Sequence of schedules
 * **/schedules/<schedule_id>/**
 Some schedule
+**For sequence you can use only GET method.** If want to change some object then use POST method.
+**For urls that listed below use only POST method:**
+* **/login/**
+* **/logout/**
+* **/signup/**
