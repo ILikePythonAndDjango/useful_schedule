@@ -8,8 +8,8 @@ If you've touched on a button from set listed abobe then you are seeing list on 
 If you've touched on a object then you can see description the object.
 
 ### Usage for Front-end Developers
-You can see urls that use it for getting data about objects. All urls returns JSON string unless **/**.
-If you request was success then you've get :
+You can see urls that returns data about objects. All urls returns JSON string unless **/**.
+If response was success then you've get :
 `{
   status: 'ok',
   some_object_or_sequence: { ... },
