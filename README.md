@@ -25,9 +25,9 @@ In another variant you can get this result:
 Sequence of goals
 * **/notes/**
 Sequence of notes
-### GET and POST
 * **/schedules/**
 Sequence of schedules
+### GET and POST
 * **/goals/<goal_id>/**
 The goal
 * **/notes/<note_id>/**
