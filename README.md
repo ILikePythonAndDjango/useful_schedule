@@ -22,12 +22,12 @@ In another variant you can get this result:
 }`
 Url | GET | POST
 ----|-----|-----
-**/goals/**|Sequence of goals| - - -
+**/goals/**|Sequence of goals| 
 **/goals/<goal_id>/**|The goal| Change the goal
-**/notes/**|Sequence of notes | - - -
+**/notes/**|Sequence of notes | 
 **/notes/<note_id>/**|The note| Change the note
-**/schedules/**|Sequence of schedules| - - -
+**/schedules/**|Sequence of schedules| 
 **/schedules/<schedule_id>/**|The schedule| Change the Schedule
-**/login/**| - - - | Log in
-**/logout/**| - - - | Log out
-**/signup/**| - - - | Sign up
+**/login/**| | Log in
+**/logout/**| | Log out
+**/signup/**| | Sign up
