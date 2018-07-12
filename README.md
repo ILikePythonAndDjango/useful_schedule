@@ -20,23 +20,14 @@ In another variant you can get this result:
   message: 'message about what is error',
   code: 12
 }`
-* **/**
-Static html
-* **/goals/**
-Sequence of goals
-* **/goals/<goal_id>/**
-Some goal
-* **/notes/**
-Sequence of notes
-* **/notes/<note_id>/**
-Some note
-* **/schedules/**
-Sequence of schedules
-* **/schedules/<schedule_id>/**
-Some schedule
-</br>
-**For sequence you can use only GET method.** If want to change some object then use POST method.
-**For urls that listed below use only POST method:**
-* **/login/**
-* **/logout/**
-* **/signup/**
+Url | GET | POST
+----|-----|-----
+**/goals/**|Sequence of goals| - - -
+**/goals/<goal_id>/**|The goal| Change the goal
+**/notes/**|Sequence of notes | - - -
+**/notes/<note_id>/**|The note| Change the note
+**/schedules/**|Sequence of schedules| - - -
+**/schedules/<schedule_id>/**|The schedule| Change the Schedule
+**/login/**| - - - | Log in
+**/logout/**| - - - | Log out
+**/signup/**| - - - | Sign up
