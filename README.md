@@ -10,16 +10,16 @@ If you've touched on a object then you can see description the object.
 ### Usage for Front-end Developers
 You can see urls that use it for getting data about objects. All urls returns JSON string unless **/**.
 If you request was success then you've get :
-'''{
+```{
   status: 'ok',
   some_object_or_sequence: { ... },
-}'''
+}```
 In another variant you can get this result:
-'''{
+```{
   status: 'error',
   message: 'message about what is error',
   code: 12
-}'''
+}```
 * **/**
 Static html
 * **/goals/**
