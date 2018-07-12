@@ -21,7 +21,7 @@ In another variant you can get this result:
   code: 12
 }`
 Url | GET | POST
-----|-----|-----
+---------------------|-------------------|------------
 **/goals/**|Sequence of goals| 
 **/goals/<goal_id>/**|The goal| Change the goal
 **/notes/**|Sequence of notes | 
