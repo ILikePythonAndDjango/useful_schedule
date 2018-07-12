@@ -20,17 +20,24 @@ In another variant you can get this result:
   message: 'message about what is error',
   code: 12
 }`
-Url | GET | POST
-----|-----|-----
-**/goals/**|Sequence of goals| 
-----|-----|-----
-**/goals/<goal_id>/**|The goal| Change the goal
-----|-----|-----
-`
-**/notes/**|Sequence of notes | 
-**/notes/<note_id>/**|The note| Change the note
-**/schedules/**|Sequence of schedules| 
-**/schedules/<schedule_id>/**|The schedule| Change the Schedule
-**/login/**| | Log in
-**/logout/**| | Log out
-**/signup/**| | Sign up
+### Only GET
+* **/goals/**
+Sequence of goals
+* **/notes/**
+Sequence of notes
+### GET and POST
+* **/schedules/**
+Sequence of schedules
+* **/goals/<goal_id>/**
+The goal
+* **/notes/<note_id>/**
+The note
+* **/schedules/<schedule_id>/**
+The schedule
+### Only POST
+* **/login/**
+Log in
+* **/logout/**
+Log uot
+* **/signup/**
+Sign up
