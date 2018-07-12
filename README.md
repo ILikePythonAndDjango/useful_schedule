@@ -3,8 +3,8 @@ It's just single page application that you can use as diary, notebook and schedu
 
 ## Usage
 ### Usage for users
-When you want to note your ideas, you can use this application. On main page you will see three buttons: Gaols, Notes, Schedules.
-If you've touched on a button from listed abobe then you are seeing list on objects: your goals, your notes, your scheduels.
+When you want to note your ideas, you can use this application. On main page you will see three buttons: Goals, Notes, Schedules.
+If you've touched on a button from set listed abobe then you are seeing list on objects: your goals, your notes, your scheduels.
 If you've touched on a object then you can see description the object.
 
 ### Usage for Front-end Developers
