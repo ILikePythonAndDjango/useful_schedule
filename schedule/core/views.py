@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.http import Http404
-from django.views.decorators.http import require_GET
+from django.http import Http404, HttpResponseRedirect
+from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth import authenticate, login, logout
 
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
 from .pagination import paginate_JSON
@@ -9,14 +10,55 @@ from .models import Goal, Note, Schedule, CostControl
 
 from datetime import date
 
+def checking_user(view):
+
+    """
+    This function is decorator that checks user every request.
+    """
+
+    def check_user(request, *args, **kwargs):
+        if request.user.is_anonymous:
+            return HttpResponseAjaxError(code=14, message="You are not authenticated!")
+        else:
+            return view(request, *args, **kwargs)
+
+    return check_user
+
+@require_POST
+def log_in(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        HttpResponseAjax()
+    HttpResponseAjaxError(code=12, message='Invalied password or username')
+
+@require_POST
+def log_out(request):
+    logout(request)
+
+@require_POST
+def sign_up(request):
+    email = request.POST.get('email')
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        HttpResponseAjaxError(code=13, message='The user have been yet')
+    User.objects.create_user(email=email, username=username, password=password)
+    log_in(request)
+
 @require_GET
+@checking_user
 def goals(request):
-    goals = [{'title': goal.title, 'url': goal.url} for goal in Goal.objects.all()]
+    goals = [{'id': goal.id, 'title': goal.title, 'url': goal.url} for goal in Goal.objects.filter(author=request.user)]
     return HttpResponseAjax(sequence=goals)
 
+@checking_user
 def goal(request, pk):
     try:
-        goal = Goal.objects.get(pk=pk)
+        goal = Goal.objects.get(pk=pk, author=request.user)
         sub_goals = [{'title': sub_goal.title, 'url': sub_goal.url} for sub_goal in goal.sub_goals.annotate()]
     except Goal.DoesNotExist:
         raise Http404
@@ -30,13 +72,15 @@ def goal(request, pk):
     })
 
 @require_GET
+@checking_user
 def notes(request):
-    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.all()]
+    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.filter(author=request.user)]
     return HttpResponseAjax(sequence=notes)
 
+@checking_user
 def note(request, pk):
     try:
-        note = Note.objects.get(id=pk)
+        note = Note.objects.get(pk=pk, author=request.user)
         cost_controls = [{'thing': cost.thing, 'url': cost.url, 'cost': cost.cost} for cost in note.cost_control.annotate()]
     except Note.DoesNotExist:
         raise Http404
@@ -48,9 +92,10 @@ def note(request, pk):
         'total_cost': note.total_cost
     })
 
-def cost(request, cost_pk):
+@checking_user
+def cost(request, pk):
     try:
-        cost = CostControl.objects.get(id=cost_pk)
+        cost = CostControl.objects.get(pk=pk, author=request.user)
     except CostControl.DoesNotExist:
         raise Http404
     return HttpResponseAjax(cost={
@@ -59,14 +104,16 @@ def cost(request, cost_pk):
     })
 
 @require_GET
+@checking_user
 def schedules(request):
-    schedules = [{'title': schedule.title, 'url': schedule.url} for schedule in Schedule.objects.all()]
+    schedules = [{'title': schedule.title, 'url': schedule.url} for schedule in Schedule.objects.filter(author=request.user)]
     return HttpResponseAjax(sequence=schedules)
 
 
+@checking_user
 def schedule(request, pk):
     try:
-        schedule = Schedule.objects.get(pk=pk)
+        schedule = Schedule.objects.get(pk=pk, author=request.user)
         tasks = []
         for task in schedule.tasks.annotate():
             tasks.append({
