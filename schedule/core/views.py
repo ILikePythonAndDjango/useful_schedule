@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
+from django.utils.datastructures import MultiValueDictKeyError
+
+from django.contrib.auth.models import User
 
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
-from .pagination import paginate_JSON
 
 from .models import Goal, Note, Schedule, CostControl
 
@@ -24,30 +27,41 @@ def checking_user(view):
 
     return check_user
 
+@csrf_exempt
 @require_POST
 def log_in(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
+    try:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+    except MultiValueDictKeyError:
+        return HttpResponseAjaxError(code=15, message="Post params don't contain username or password!")
     user = authenticate(username=username, password=password)
     if user is not None:
         login(request, user)
-        HttpResponseAjax()
-    HttpResponseAjaxError(code=12, message='Invalied password or username')
+        return HttpResponseAjax(message="You have logged in!")
+    return HttpResponseAjaxError(code=12, message='Invalied password or username')
 
+@csrf_exempt
 @require_POST
 def log_out(request):
     logout(request)
+    return HttpResponseAjax(message="You have logged out!")
 
+@csrf_exempt
 @require_POST
 def sign_up(request):
-    email = request.POST.get('email')
-    username = request.POST.get('username')
-    password = request.POST.get('password')
+    try:
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+    except MultiValueDictKeyError:
+        return HttpResponseAjaxError(code=15, message="Post params don't contain usernam, password or email!")
     user = authenticate(username=username, password=password)
     if user is not None:
-        HttpResponseAjaxError(code=13, message='The user have been yet')
-    User.objects.create_user(email=email, username=username, password=password)
-    log_in(request)
+        return HttpResponseAjaxError(code=13, message='The user have been yet')
+    user = User.objects.create_user(email=email, username=username, password=password)
+    login(request, user)
+    return HttpResponseAjax(message="You have signed up and logged in!")
 
 @require_GET
 @checking_user

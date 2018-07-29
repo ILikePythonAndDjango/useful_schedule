@@ -30,16 +30,16 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+      <div class="collapse navbar-collapse" id="navigation">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Log In</a>
+            <a class="nav-link" href="/uploads/login.html">{{ logInButtonText }}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#">Log Out</a>
+            <a v-on:click="logOut()" class="nav-link">{{ logOutButtonText }}</a>
           </li>
            <li class="nav-item">
-            <a class="nav-link" href="#">Sign Up</a>
+            <a class="nav-link" href="/uploads/signup.html">{{ signUpButtonText }}</a>
           </li>
         </ul>
       </div>
@@ -53,12 +53,8 @@
         <button class="btn btn-outline-success" v-on:click="renderSequence('/schedules/')">Schedules</button>
         <div>
           <ul>
-            <items v-for='item in sequence' v-bind:item='item' v-bind:key='item.id'></items>
+            <items v-for='item in sequence' v-bind:item='item'></items>
           </ul>
-          <h3>{{ obj.title }}</h3>
-          <p>{{ obj.deadline }}</p>
-          <p>{{ obj.content }}</p>
-        </div>
       </div>
 
     </main><!-- /.container -->
