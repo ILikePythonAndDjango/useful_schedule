@@ -57,7 +57,7 @@ class CostControl(models.Model):
     @property
     def url(self):
         '''Gets current url for the cost control.'''
-        return reverse('cost', kwargs={'cost_pk': self.id})
+        return reverse('cost', kwargs={'pk': self.id})
 
 class Note(models.Model):
     

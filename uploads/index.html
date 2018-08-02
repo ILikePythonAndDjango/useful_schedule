@@ -47,17 +47,108 @@
 
     <main role="main" class="container">
 
+    <!-- template for modal window -->
+    <script type="text/x-template" id="modal-template">
+      <transition name="modal">
+        <div class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-container">
+    
+              <div class="modal-header">
+                <slot name="header">
+                  default header
+                </slot>
+              </div>
+    
+              <div class="modal-body">
+                <slot name="body">
+                  default body
+                </slot>
+              </div>
+    
+              <div class="modal-footer">
+                <slot name="footer">
+                  <button class="btn btn-outline-success modal-default-button" @click="$emit('close')">
+                    Close
+                  </button>
+                </slot>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </script>
+
+    <!-- modal windows -->
+    <div id="modal_window">
+
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreateGoalModal = true">Create Goal</button>
+
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreateNoteModal = true">Create Note</button>
+
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreatScheduleModal = true">Create Schedule</button>
+
+      
+      <!-- Form and modal window for creating goal -->
+      <modal v-if="showCreateGoalModal" @close="showCreateGoalModal = false">
+        <h3 slot="header">Creating goal</h3>
+        <div class="user_input" slot="body">
+          <div class="form-label-group">
+            <input id="inputGoalTitle" class="form-control" placeholder="Title for goal" required="" autofocus="" type="text" v-model='newGoalTitle'>
+          </div>
+
+          <div class="form-label-group">
+            <input id="inputGoalContent" class="form-control" placeholder="Content" required="" type="text" v-model='newGoalContent'>
+          </div>
+
+          <div class="form-label-group">
+            <input id="inputGoalDeadline" class="form-control" required="" type="date" v-model='newGoalDeadline'>
+          </div>
+
+          <button v-on:click="createGoal()" class="btn btn-lg btn-primary">Create</button>
+        </div>
+      </modal>
+
+      <!-- Form and modal window for creating note -->
+      <modal v-if="showCreateNoteModal" @close="showCreateNoteModal = false">
+        <h3 slot="header">Creating note</h3>
+        <div class="user_input" slot="body">
+          <div class="form-label-group">
+            <input id="inputNoteTime" class="form-control" required="" type="time" v-model='newNoteTime'>
+          </div>
+
+          <div class="form-label-group">
+            <input id="inputNoteDate" class="form-control" required="" type="date" v-model='newNoteDate'>
+          </div>
+
+          <div class="form-label-group">
+            <input id="inputNoteText" class="form-control" placeholder="Text for note" required="" autofocus="" type="text" v-model='newNoteText'>
+          </div>
+
+          <button v-on:click="createNote()" class="btn btn-lg btn-primary">Create</button>
+        </div>
+      </modal>
+
+      <!-- Form and modal window for creating schedule -->
+      <modal v-if="showCreatScheduleModal" @close="showCreatScheduleModal = false">
+        <h3 slot="header">Creating schedule</h3>
+      </modal>
+
+    </div>
+
       <div id="app">
         <button class="btn btn-outline-success" v-on:click="renderSequence('/goals/')">Goals</button>
         <button class="btn btn-outline-success" v-on:click="renderSequence('/notes/')">Notes</button>
         <button class="btn btn-outline-success" v-on:click="renderSequence('/schedules/')">Schedules</button>
         <div>
-          <ul>
-            <items v-for='item in sequence' v-bind:item='item'></items>
+          <ul v-if="sequence.length">
+            <li v-for="obj of sequence">
+              {{ obj.title }}
+            </li>
           </ul>
       </div>
 
-    </main><!-- /.container -->
+    </main>
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS with Vue.js and Axios -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>

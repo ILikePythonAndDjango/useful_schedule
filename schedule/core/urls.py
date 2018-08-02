@@ -12,5 +12,5 @@ urlpatterns = (
     path('schedules/<int:pk>/', views.schedule, name='schedule'),
     path('login/', views.log_in),
     path('logout/', views.log_out),
-    path('signup/', views.sign_up)
+    path('signup/', views.sign_up),
 )

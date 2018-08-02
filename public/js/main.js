@@ -1,7 +1,3 @@
-Vue.component('items',{
-	props: ['item'],
-	template: '<li>{{ item.title }}</li>',
-})
 
 var app = new Vue({
 	el: '#app',
@@ -20,6 +16,8 @@ var app = new Vue({
 			}).catch(function (e) {
 				alert(e)
 			})
+			console.log(this.sequence)
+			if (sequence.length === 0) alert("Sequence is empty")
 		},
 	},
 })
@@ -99,6 +97,74 @@ var register = new Vue({
 				this.password = ''
 				this.email = ''
 			}
+		},
+	},
+})
+
+Vue.component('modal', {
+  template: '#modal-template',
+})
+
+var modal_window = new Vue({
+	el: '#modal_window',
+	data: {
+
+		//management for modal windows
+		showModal: false,
+		showCreateGoalModal: false,
+		showCreateNoteModal: false,
+		showCreatScheduleModal: false,
+		showCreateTask: false,
+
+		//fields for creating new goal
+		newGoalTitle: '',
+		newGoalContent: '',
+		newGoalDeadline: null,
+
+		//fields for creating new note
+		newNoteTime: null,
+		newNoteDate: null,
+		newNoteText: '',
+
+		//fields for creating new schedule
+	},
+	methods: {
+		createGoal: function () {
+			var FD = new FormData()
+			FD.append("title", this.newGoalTitle)
+			FD.append("content", this.newGoalContent)
+			FD.append("deadline", this.newGoalDeadline)
+
+			axios.post("/goals/1/", FD)
+			.then(function (response) {
+				if (response.data.status === 'ok') {
+					console.log(response.data)
+					alert("Goal was created")
+				} else {
+					alert(response.data.message)
+				}
+			}).catch(function (error) {
+				alert(error)
+			})
+		},
+		createNote: function () {
+			var FD = new FormData();
+			FD.append("time", this.newNoteTime)
+			FD.append("date", this.newNoteDate)
+			FD.append("text", this.newNoteText)
+
+			axios.post("/notes/1/", FD)
+			.then(function (response) {
+				if (response.data.status === 'ok') {
+					console.log(data)
+					alert("Note was created")
+					console.log(response.data.new_note)
+				} else {
+					alert(response.data.message)
+				}
+			}).catch(function (error) {
+				alert(error)
+			})
 		},
 	},
 })

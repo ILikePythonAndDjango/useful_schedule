@@ -4,12 +4,13 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.utils.datastructures import MultiValueDictKeyError
+from django.utils.timezone import now
 
 from django.contrib.auth.models import User
 
 from .ajax import HttpResponseAjax, HttpResponseAjaxError
 
-from .models import Goal, Note, Schedule, CostControl
+from .models import Goal, Note, Schedule, CostControl, TypeGoal
 
 from datetime import date
 
@@ -69,8 +70,74 @@ def goals(request):
     goals = [{'id': goal.id, 'title': goal.title, 'url': goal.url} for goal in Goal.objects.filter(author=request.user)]
     return HttpResponseAjax(sequence=goals)
 
+@csrf_exempt
 @checking_user
 def goal(request, pk):
+
+    if request.method == 'POST':
+
+        if request.POST.get('delete_goal', False):
+            try:
+                Goal.objects.get(pk=pk).delete()
+            except Goal.DoesNotExist:
+                raise Http404
+            return HttpResponseAjax(message="Goal was deleted!!!")
+
+        try:
+            #checking contains params that must contains in POST
+            new_goal_title = request.POST.get('title')
+            new_goal_content = request.POST.get('content')
+            new_goal_deadline = request.POST.get('deadline')
+        except MultiValueDictKeyError:
+            return HttpResponseAjaxError(code=16, message="You've not puted params that must contians in POST")
+
+        #params that should contains in POST
+        try:
+            new_goal_type_goal_id = int(request.POST.get('type_goal_id', 1))
+        except ValueError:
+            return HttpResponseAjaxError(code=17, message="Invalid POST params!!")
+        #may be request.POST.get('begin') raise Error
+        new_goal_begin = request.POST.get('begin', now())
+        new_goal_is_done = bool(request.POST.get('begin', False))
+        new_goal_sub_goals_id = request.POST.get('sub_goals_id', tuple())
+        new_goal_cost = request.POST.get('cost', None)
+
+        #creating new goal
+        new_goal = Goal.objects.create(
+            title=new_goal_title,
+            content=new_goal_content,
+            author=request.user,
+            tag=TypeGoal.objects.get(id=new_goal_type_goal_id),
+            begin=new_goal_begin,
+            deadline=new_goal_deadline,
+            is_done=new_goal_is_done,
+            cost=new_goal_cost
+        )
+
+        if new_goal_sub_goals_id:
+            #appending sub goals into new goal
+            for sub_goal_id in new_goal_sub_goals_id:
+                try:
+                    sub_goal = Goal.objects.get(id=sub_goal_id)
+                except Goal.DoesNotExist:
+                    return HttpResponseAjaxError(code=18, message="This sub goal does not exits!!!")
+                if sub_goal.tag__id != 2:
+                    return HttpResponseAjaxError(code=19, message="This goal isn't sub goal!!")
+                new_goal.sub_goals.add(sub_goal)
+            new_goal.save()
+
+        return HttpResponseAjax(message="Goal was created!!!", new_goal={
+            "title": new_goal.title,
+            "content": new_goal.content,
+            "author_name": new_goal.author.username,
+            "tag_title": new_goal.tag.title,
+            "begin": str(new_goal.begin),
+            "deadline": str(new_goal.deadline),
+            "is_done": new_goal.is_done,
+            #"sub_goals": [(sug_goal.title, sub_goal.url) for sub_goal in new_goal.sub_goals],
+            "cost": new_goal.cost,
+        })
+
     try:
         goal = Goal.objects.get(pk=pk, author=request.user)
         sub_goals = [{'title': sub_goal.title, 'url': sub_goal.url} for sub_goal in goal.sub_goals.annotate()]
@@ -91,8 +158,54 @@ def notes(request):
     notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.filter(author=request.user)]
     return HttpResponseAjax(sequence=notes)
 
+@csrf_exempt
 @checking_user
 def note(request, pk):
+
+    if request.method == 'POST':
+
+        if request.POST.get("delete_note", False):
+            try:
+                Note.objects.get(pk=pk).delete()
+            except Note.DoesNotExist:
+                raise Http404
+            return HttpResponseAjax(message="Note was deleted!!!")
+
+        try:
+            #checking contains params that must contains in POST
+            new_note_time = request.POST.get('time')
+            new_note_date = request.POST.get('date')
+            new_note_text = request.POST.get("text")
+        except MultiValueDictKeyError:
+            return HttpResponseAjaxError(code=17, message="Invalid POST params!!")
+
+        new_note_cost_controls_id = request.POST.get('cost_controls_id', tuple())
+
+        new_note = Note.objects.create(
+            time = new_note_time,
+            date = new_note_date,
+            text = new_note_text,
+            author = request.user
+        )
+
+        if new_note_cost_controls_id:
+            #appending cost controls into new note
+            for cost_control_id in new_note_cost_controls_id:
+                try:
+                    cost_control = CostControl.objects.get(id=cost_control_id)
+                except CostControl.DoesNotExist:
+                    return HttpResponseAjaxError(code=18, message="This cost contorl does not exists!!")
+                new_note.cost_control.add(cost_control)
+            new_note.save()
+
+        return HttpResponseAjax(message="Note was created!!!", new_note={
+            "time": str(new_note.time),
+            "date": str(new_note.date),
+            "text": new_note.text,
+            "author": new_note.author.username,
+            "total_cost": new_note.total_cost
+        })
+
     try:
         note = Note.objects.get(pk=pk, author=request.user)
         cost_controls = [{'thing': cost.thing, 'url': cost.url, 'cost': cost.cost} for cost in note.cost_control.annotate()]
