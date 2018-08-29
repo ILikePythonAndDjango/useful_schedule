@@ -7,21 +7,21 @@ var app = new Vue({
 	methods: {
 		renderSequence: function (url) {
 			axios.get(url)
+			var self = this
 			.then(function (response) {
 				if (response.data.status === 'error') {
 					alert(response.data.message)
 				} else {
-					this.sequence = response.data.sequence
+					self.sequence = response.data.sequence
 				}
 			}).catch(function (e) {
 				alert(e)
 			})
 			console.log(this.sequence)
-			if (this.sequence.length === 0) alert("Sequence is empty")
 		},
 	},
 })
-	
+
 var nav = new Vue({
 	el: '#navigation',
 	data: {
@@ -89,7 +89,7 @@ var register = new Vue({
 				.then(function (response) {
 					alert(response.data.message)
 					window.history.go(-1)
-					
+
 				}).catch(function (error) {
 					alert(error)
 				})
