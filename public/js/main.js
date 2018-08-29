@@ -6,8 +6,8 @@ var app = new Vue({
 	},
 	methods: {
 		renderSequence: function (url) {
-			axios.get(url)
 			var self = this
+			axios.get(url)
 			.then(function (response) {
 				if (response.data.status === 'error') {
 					alert(response.data.message)
