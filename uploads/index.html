@@ -82,15 +82,15 @@
     <!-- modal windows -->
     <div id="modal_window">
 
-      <button class="btn btn-outline-success" id="show-modal" @click="showCreateGoalModal = true">Create Goal</button>
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreatingGoalModal = true">Create Goal</button>
 
-      <button class="btn btn-outline-success" id="show-modal" @click="showCreateNoteModal = true">Create Note</button>
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreatingNoteModal = true">Create Note</button>
 
-      <button class="btn btn-outline-success" id="show-modal" @click="showCreatScheduleModal = true">Create Schedule</button>
+      <button class="btn btn-outline-success" id="show-modal" @click="showCreatingScheduleModal = true">Create Schedule</button>
 
       
       <!-- Form and modal window for creating goal -->
-      <modal v-if="showCreateGoalModal" @close="showCreateGoalModal = false">
+      <modal v-if="showCreatingGoalModal" @close="showCreatingGoalModal = false">
         <h3 slot="header">Creating goal</h3>
         <div class="user_input" slot="body">
           <div class="form-label-group">
@@ -110,28 +110,41 @@
       </modal>
 
       <!-- Form and modal window for creating note -->
-      <modal v-if="showCreateNoteModal" @close="showCreateNoteModal = false">
+      <modal v-if="showCreatingNoteModal" @close="showCreatingNoteModal = false">
         <h3 slot="header">Creating note</h3>
         <div class="user_input" slot="body">
           <div class="form-label-group">
-            <input id="inputNoteTime" class="form-control" required="" type="time" v-model='newNoteTime'>
-          </div>
-
-          <div class="form-label-group">
-            <input id="inputNoteDate" class="form-control" required="" type="date" v-model='newNoteDate'>
-          </div>
-
-          <div class="form-label-group">
             <input id="inputNoteText" class="form-control" placeholder="Text for note" required="" autofocus="" type="text" v-model='newNoteText'>
           </div>
+
+          <div class="form-label-group">
+            <select v-if="newNoteCostControls.length" name="cost controls" id="selectNoteCostContorls" class="form-control">
+              <option v-for="costControl in newNoteCostControls" selected="">{{ costControl.thing }}</option>
+            </select>
+          </div>
+          <button v-on:click="appendNewCostControlToNote()" class="btn btn-lg btn-primary">Create</button>
 
           <button v-on:click="createNote()" class="btn btn-lg btn-primary">Create</button>
         </div>
       </modal>
 
       <!-- Form and modal window for creating schedule -->
-      <modal v-if="showCreatScheduleModal" @close="showCreatScheduleModal = false">
+      <modal v-if="showCreatingScheduleModal" @close="showCreatingScheduleModal = false">
         <h3 slot="header">Creating schedule</h3>
+      </modal>
+
+      <!-- Form and modal window for creating cost contorl -->
+      <modal v-if="showCreateingCostControl" @close="showCreateingCostControl = false">
+        <h3 slot="header">Creating cost contorl</h3>
+        <div class="user_input" slot="body">
+          <div class="form-label-group">
+            <input id="inputCostControlThing" class="form-control" placeholder="Whas is it?" required="" autofocus="" type="text" v-model='newCostControlThing'>
+          </div>
+          <div class="form-label-group">
+            <input id="inputCostControlCost" class="form-control" placeholder="Cost" required="" type="text" v-model='newCostControlCost'>
+          </div>
+          <button v-on:click="createNewCostControl()" class="btn btn-lg btn-primary">Create</button>
+        </div>
       </modal>
 
     </div>

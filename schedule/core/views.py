@@ -155,7 +155,7 @@ def goal(request, pk):
 @require_GET
 @checking_user
 def notes(request):
-    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.filter(author=request.user)]
+    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.filter(author__id=request.user.id)]
     return HttpResponseAjax(sequence=notes)
 
 @csrf_exempt
@@ -173,22 +173,24 @@ def note(request, pk):
 
         try:
             #checking contains params that must contains in POST
-            new_note_time = request.POST.get('time')
-            new_note_date = request.POST.get('date')
             new_note_text = request.POST.get("text")
         except MultiValueDictKeyError:
             return HttpResponseAjaxError(code=17, message="Invalid POST params!!")
 
         new_note_cost_controls_id = request.POST.get('cost_controls_id', tuple())
 
+        with open("/home/nikita/development/python3/WebDev/Django2.0.5/dev/useful_schedule/schedule/core/log.log", "w") as log:
+            log.write(str(new_note_cost_controls_id))
+
         new_note = Note.objects.create(
-            time = new_note_time,
-            date = new_note_date,
             text = new_note_text,
             author = request.user
         )
 
-        if new_note_cost_controls_id:
+        if new_note_cost_controls_id and not new_note_cost_controls_id.startswith(","):
+
+            new_note_cost_controls_id = map(lambda x: int(x), new_note_cost_controls_id.split(","))
+
             #appending cost controls into new note
             for cost_control_id in new_note_cost_controls_id:
                 try:
@@ -199,6 +201,7 @@ def note(request, pk):
             new_note.save()
 
         return HttpResponseAjax(message="Note was created!!!", new_note={
+            "id": new_note.id,
             "time": str(new_note.time),
             "date": str(new_note.date),
             "text": new_note.text,
@@ -219,13 +222,67 @@ def note(request, pk):
         'total_cost': note.total_cost
     })
 
+@csrf_exempt
 @checking_user
 def cost(request, pk):
+
+    if request.method == "POST":
+
+        if request.POST.get("delete_cost", False):
+            try:
+                CostControl.objects.get(pk=pk).delete()
+            except CostControl.DoesNotExist:
+                raise Http404
+            return HttpResponseAjax(message="Cost was deleted!!!")
+
+        try:
+            #checking contains params that must contains in POST
+            new_cost_control_thing = request.POST.get("thing")
+            new_cost_control_cost = request.POST.get('cost')
+        except MultiValueDictKeyError:
+            return HttpResponseAjaxError(code=17, message="Invalid POST params!!")
+
+        #creating new cost control
+        new_cost_control = CostControl.objects.create(
+            thing=new_cost_control_thing,
+            cost=new_cost_control_cost,
+            author=request.user
+        )
+
+        return HttpResponseAjax(message='Cost Control was created', new_cost_control={
+            "id": new_cost_control.id,
+            "thing": new_cost_control.thing,
+            "cost": new_cost_control.cost,
+        })
+
+    #initialization GET params
+    try:
+        is_latest_for_this_user = int(request.GET.get("new", 0))
+    except ValueError:
+        return HttpResponseAjaxError(code=20, message='Invalid GET params!!')
+
+
+    ''' CODE BELOW IS'NT USEFUL '''
+    #returns the latest cost control for this user
+    if is_latest_for_this_user :
+        try:
+            latest_created_cost_control_for_this_user = CostControl.objects.filter(author=request.user)[0]
+        except CostControl.DoesNotExist:
+            return HttpResponseAjaxError(code=21, message="You don't have any cost control!!!")
+        else:
+            return HttpResponseAjax(latest_cost_control={
+                "id": latest_created_cost_control_for_this_user.id,
+                "thing": latest_created_cost_control_for_this_user.thing,
+                "cost": latest_created_cost_control_for_this_user.cost,
+            })            
+
+    #returns the cost control
     try:
         cost = CostControl.objects.get(pk=pk, author=request.user)
     except CostControl.DoesNotExist:
         raise Http404
     return HttpResponseAjax(cost={
+        'id': cost.id,
         'thing': cost.thing,
         'cost': cost.cost
     })

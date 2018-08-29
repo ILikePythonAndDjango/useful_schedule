@@ -6,7 +6,7 @@ from django.urls import reverse
 class TypeGoal(models.Model):
 
     '''
-    This model helps the application to sort goals on MainGoal and SubGoal
+    This model helps the application to sort goals on MainGoal and SubGoal, NoteGoal
     '''
 
     title = models.CharField(max_length=100)
@@ -58,6 +58,9 @@ class CostControl(models.Model):
     def url(self):
         '''Gets current url for the cost control.'''
         return reverse('cost', kwargs={'pk': self.id})
+
+    class Meta:
+        ordering = ("-id",)
 
 class Note(models.Model):
     

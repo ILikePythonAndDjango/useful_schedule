@@ -17,7 +17,7 @@ var app = new Vue({
 				alert(e)
 			})
 			console.log(this.sequence)
-			if (sequence.length === 0) alert("Sequence is empty")
+			if (this.sequence.length === 0) alert("Sequence is empty")
 		},
 	},
 })
@@ -101,6 +101,8 @@ var register = new Vue({
 	},
 })
 
+
+//Vue component for working with modal windows
 Vue.component('modal', {
   template: '#modal-template',
 })
@@ -111,10 +113,11 @@ var modal_window = new Vue({
 
 		//management for modal windows
 		showModal: false,
-		showCreateGoalModal: false,
-		showCreateNoteModal: false,
-		showCreatScheduleModal: false,
-		showCreateTask: false,
+		showCreatingGoalModal: false,
+		showCreatingNoteModal: false,
+		showCreatingScheduleModal: false,
+		showCreatingTask: false,
+		showCreateingCostControl: false,
 
 		//fields for creating new goal
 		newGoalTitle: '',
@@ -125,10 +128,16 @@ var modal_window = new Vue({
 		newNoteTime: null,
 		newNoteDate: null,
 		newNoteText: '',
+		newNoteCostControls: [],
+
+		//fields for creating new cost control
+		newCostControlThing: '',
+		newCostControlCost: 0,
 
 		//fields for creating new schedule
 	},
 	methods: {
+		//Methods that listed below it's methods for working with goals
 		createGoal: function () {
 			var FD = new FormData()
 			FD.append("title", this.newGoalTitle)
@@ -147,21 +156,58 @@ var modal_window = new Vue({
 				alert(error)
 			})
 		},
+
+		//Methods that listed below it's methods for working with notes
 		createNote: function () {
 			var FD = new FormData();
-			FD.append("time", this.newNoteTime)
-			FD.append("date", this.newNoteDate)
 			FD.append("text", this.newNoteText)
+			FD.append("cost_controls_id", this.newNoteCostControls.map((costControl) => {costControl.id.get}))
+
+			console.log(this.newNoteCostControls.map((costControl) => {costControl.id}))
+			console.log(this.newNoteCostControls)
 
 			axios.post("/notes/1/", FD)
 			.then(function (response) {
 				if (response.data.status === 'ok') {
-					console.log(data)
+					console.log(response.data)
 					alert("Note was created")
 					console.log(response.data.new_note)
 				} else {
 					alert(response.data.message)
 				}
+			}).catch(function (error) {
+				alert(error)
+			})
+		},
+		appendNewCostControlToNote: function () {
+			this.showCreateingCostControl = true
+		},
+
+		//Methods that listed below it's methods for working with cost controls
+		createNewCostControl: function () {
+			var link_on_this = this
+
+			var FD = new FormData();
+			FD.append("thing", this.newCostControlThing)
+			FD.append("cost", this.newCostControlCost)
+
+			axios.post("/things/1/", FD)
+			.then(function (response) {
+				console.log(response.data)
+				alert("Cost control was created!!")
+				link_on_this.newNoteCostControls.push({
+					id: response.data.new_cost_control.id,
+					thing: response.data.new_cost_control.thing,
+				})
+			}).catch(function (error) {
+				alert(error)
+			})
+		},
+		getNewCostControl: function () {
+			var link_on_this = this;
+			axios.get("/things/1/?new=1")
+			.then(function (response) {
+				link_on_this.newNoteCostControls.push(response.data.latest_cost_control)
 			}).catch(function (error) {
 				alert(error)
 			})
