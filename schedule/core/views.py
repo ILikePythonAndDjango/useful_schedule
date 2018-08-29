@@ -155,7 +155,7 @@ def goal(request, pk):
 @require_GET
 @checking_user
 def notes(request):
-    notes = [{'title': str(note.date), 'url': note.url} for note in Note.objects.filter(author__id=request.user.id)]
+    notes = [{'title': str(note), 'url': note.url} for note in Note.objects.filter(author__id=request.user.id)]
     return HttpResponseAjax(sequence=notes)
 
 @csrf_exempt
@@ -274,7 +274,7 @@ def cost(request, pk):
                 "id": latest_created_cost_control_for_this_user.id,
                 "thing": latest_created_cost_control_for_this_user.thing,
                 "cost": latest_created_cost_control_for_this_user.cost,
-            })            
+            })
 
     #returns the cost control
     try:
