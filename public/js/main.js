@@ -128,7 +128,7 @@ var modal_window = new Vue({
 		newNoteTime: null,
 		newNoteDate: null,
 		newNoteText: '',
-		newNoteCostControls: [],
+		newNoteArrayUncreatedCostControls: [],
 
 		//fields for creating new cost control
 		newCostControlThing: '',
@@ -136,6 +136,7 @@ var modal_window = new Vue({
 
 		//fields for creating new schedule
 	},
+
 	methods: {
 		//Methods that listed below it's methods for working with goals
 		createGoal: function () {
@@ -161,10 +162,9 @@ var modal_window = new Vue({
 		createNote: function () {
 			var FD = new FormData();
 			FD.append("text", this.newNoteText)
-			FD.append("cost_controls_id", this.newNoteCostControls.map((costControl) => {costControl.id.get}))
+			FD.append("cost_controls", JSON.stringify(this.newNoteArrayUncreatedCostControls))
 
-			console.log(this.newNoteCostControls.map((costControl) => {costControl.id}))
-			console.log(this.newNoteCostControls)
+			console.log(this.newNoteArrayUncreatedCostControls)
 
 			axios.post("/notes/1/", FD)
 			.then(function (response) {
@@ -179,35 +179,20 @@ var modal_window = new Vue({
 				alert(error)
 			})
 		},
+
 		appendNewCostControlToNote: function () {
-			this.showCreateingCostControl = true
-		},
-
-		//Methods that listed below it's methods for working with cost controls
-		createNewCostControl: function () {
-			var link_on_this = this
-
-			var FD = new FormData();
-			FD.append("thing", this.newCostControlThing)
-			FD.append("cost", this.newCostControlCost)
-
-			axios.post("/things/1/", FD)
-			.then(function (response) {
-				console.log(response.data)
-				alert("Cost control was created!!")
-				link_on_this.newNoteCostControls.push({
-					id: response.data.new_cost_control.id,
-					thing: response.data.new_cost_control.thing,
-				})
-			}).catch(function (error) {
-				alert(error)
+			var self = this
+			this.newNoteArrayUncreatedCostControls.push({
+				thing: self.newCostControlThing,
+				cost: self.newCostControlCost
 			})
 		},
+
 		getNewCostControl: function () {
-			var link_on_this = this;
+			var self = this;
 			axios.get("/things/1/?new=1")
 			.then(function (response) {
-				link_on_this.newNoteCostControls.push(response.data.latest_cost_control)
+				self.newNoteCostControls.push(response.data.latest_cost_control)
 			}).catch(function (error) {
 				alert(error)
 			})

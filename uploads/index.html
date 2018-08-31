@@ -117,12 +117,16 @@
             <input id="inputNoteText" class="form-control" placeholder="Text for note" required="" autofocus="" type="text" v-model='newNoteText'>
           </div>
 
+          <hr>
+
           <div class="form-label-group">
-            <select v-if="newNoteCostControls.length" name="cost controls" id="selectNoteCostContorls" class="form-control">
-              <option v-for="costControl in newNoteCostControls" selected="">{{ costControl.thing }}</option>
+            <select v-if="newNoteArrayUncreatedCostControls.length" name="cost controls" id="selectNoteCostContorls" class="form-control">
+              <option v-for="costControl in newNoteArrayUncreatedCostControls" selected="">{{ costControl.thing }}</option>
             </select>
           </div>
-          <button v-on:click="appendNewCostControlToNote()" class="btn btn-lg btn-primary">Create</button>
+          <button v-on:click="showCreateingCostControl = true" class="btn btn-lg btn-primary">Create cost control</button>
+
+          <hr>
 
           <button v-on:click="createNote()" class="btn btn-lg btn-primary">Create</button>
         </div>
@@ -143,7 +147,7 @@
           <div class="form-label-group">
             <input id="inputCostControlCost" class="form-control" placeholder="Cost" required="" type="text" v-model='newCostControlCost'>
           </div>
-          <button v-on:click="createNewCostControl()" class="btn btn-lg btn-primary">Create</button>
+          <button v-on:click="appendNewCostControlToNote()" class="btn btn-lg btn-primary">Create</button>
         </div>
       </modal>
 

@@ -14,6 +14,10 @@ from .models import Goal, Note, Schedule, CostControl, TypeGoal
 
 from datetime import date
 
+from schedule.settings import BASE_DIR
+
+import json
+
 def checking_user(view):
 
     """
@@ -177,27 +181,21 @@ def note(request, pk):
         except MultiValueDictKeyError:
             return HttpResponseAjaxError(code=17, message="Invalid POST params!!")
 
-        new_note_cost_controls_id = request.POST.get('cost_controls_id', tuple())
-
-        with open("/home/nikita/development/python3/WebDev/Django2.0.5/dev/useful_schedule/schedule/core/log.log", "w") as log:
-            log.write(str(new_note_cost_controls_id))
+        new_note_cost_controls = request.POST.get('cost_controls', tuple())
 
         new_note = Note.objects.create(
             text = new_note_text,
             author = request.user
         )
 
-        if new_note_cost_controls_id and not new_note_cost_controls_id.startswith(","):
-
-            new_note_cost_controls_id = map(lambda x: int(x), new_note_cost_controls_id.split(","))
-
-            #appending cost controls into new note
-            for cost_control_id in new_note_cost_controls_id:
-                try:
-                    cost_control = CostControl.objects.get(id=cost_control_id)
-                except CostControl.DoesNotExist:
-                    return HttpResponseAjaxError(code=18, message="This cost contorl does not exists!!")
-                new_note.cost_control.add(cost_control)
+        if new_note_cost_controls:
+            cost_controls = json.loads(new_note_cost_controls)
+            for cc in cost_controls:
+                new_note.cost_control.add(CostControl.objects.create(
+                    thing=cc['thing'], 
+                    cost=cc['cost'], 
+                    author=request.user
+                ))
             new_note.save()
 
         return HttpResponseAjax(message="Note was created!!!", new_note={
@@ -254,27 +252,6 @@ def cost(request, pk):
             "thing": new_cost_control.thing,
             "cost": new_cost_control.cost,
         })
-
-    #initialization GET params
-    try:
-        is_latest_for_this_user = int(request.GET.get("new", 0))
-    except ValueError:
-        return HttpResponseAjaxError(code=20, message='Invalid GET params!!')
-
-
-    ''' CODE BELOW IS'NT USEFUL '''
-    #returns the latest cost control for this user
-    if is_latest_for_this_user :
-        try:
-            latest_created_cost_control_for_this_user = CostControl.objects.filter(author=request.user)[0]
-        except CostControl.DoesNotExist:
-            return HttpResponseAjaxError(code=21, message="You don't have any cost control!!!")
-        else:
-            return HttpResponseAjax(latest_cost_control={
-                "id": latest_created_cost_control_for_this_user.id,
-                "thing": latest_created_cost_control_for_this_user.thing,
-                "cost": latest_created_cost_control_for_this_user.cost,
-            })
 
     #returns the cost control
     try:
